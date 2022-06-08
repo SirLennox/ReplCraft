@@ -9,6 +9,7 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.sirlennox.replcraftclient.api.Entity;
 import dev.sirlennox.replcraftclient.api.GameProfile;
+import dev.sirlennox.replcraftclient.api.block.Block;
 import dev.sirlennox.replcraftclient.api.fuel.FuelInfo;
 import dev.sirlennox.replcraftclient.api.inventory.slot.ItemSlot;
 import dev.sirlennox.replcraftclient.api.inventory.slot.SlotReference;
@@ -129,7 +130,7 @@ public class ReplCraftClient {
      * @param sourceContainer The block that will be moved (if null : will be taken from the structure inventory)
      * @param dropsContainer If a block is being placed, the drops of it will be stored in the given container block (if null: will be put in the structure inventory)
      */
-    public CompletableFuture<Response> setBlock(@NotNull final IntVector location, @NotNull final String block, @Nullable final IntVector sourceContainer, @Nullable final IntVector dropsContainer) {
+    public CompletableFuture<Response> setBlock(@NotNull final IntVector location, @NotNull final Block block, @Nullable final IntVector sourceContainer, @Nullable final IntVector dropsContainer) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -137,7 +138,7 @@ public class ReplCraftClient {
         data.add("y", location.getY());
         data.add("z", location.getZ());
 
-        data.add("blockData", block);
+        data.add("blockData", block.toString());
 
         if (Objects.isNull(sourceContainer)) {
             data.add("source_x", Json.NULL);
@@ -458,6 +459,19 @@ public class ReplCraftClient {
         final CompletableFuture<FuelInfo> callback = new CompletableFuture<>();
 
         this.send("fuelinfo", new JsonObject()).whenComplete(this.inheritException(callback, response -> callback.complete(FuelInfo.fromJson(response.getData()))));
+
+        return callback;
+    }
+
+    /**
+     * @return Returns the block info of the specified structure-relative coordinates
+     */
+    public CompletableFuture<Block> getBlock(@NotNull final IntVector location) {
+        final CompletableFuture<Block> callback = new CompletableFuture<>();
+        final JsonObject data = new JsonObject();
+        location.apply(data);
+
+        this.send("get_block", data).whenComplete(this.inheritException(callback, response -> callback.complete(Block.parse(response.getData().get("block").asString()))));
 
         return callback;
     }
