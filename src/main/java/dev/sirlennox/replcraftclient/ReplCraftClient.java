@@ -408,7 +408,6 @@ public class ReplCraftClient {
         data.add("target", target);
         data.add("message", message);
 
-
         this.send("tell", data).whenComplete(this.inheritException(callback, callback::complete));
 
         return callback;

@@ -3,6 +3,7 @@ package dev.sirlennox.replcraftclient;
 import com.neovisionaries.ws.client.WebSocketException;
 import dev.sirlennox.replcraftclient.api.Transaction;
 import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
+import dev.sirlennox.replcraftclient.api.listener.IListener;
 import dev.sirlennox.replcraftclient.api.listener.ListenerAdapter;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class ReplCraftTest {
                 /* A public token */ "eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4IjotNDAsInkiOjY1LCJ6IjotNjQsInV1aWQiOiIxOWQzMTE3Yi04OWMxLTQ4N2MtOWI2MC04MDBmY2YyYjQzOTUiLCJ1c2VybmFtZSI6IkBQVUJMSUMiLCJwZXJtaXNzaW9uIjoicHVibGljIn0.MzUQ-Z8Bsgsho_0WuZNcxb7RyHp2Yr_WoRruBTtuYH4"
         );
 
-        replCraftClient.addListener(new ListenerAdapter() { /* Adds an event listener to the replclient */
+        replCraftClient.addListener(new IListener() { /* Adds an event listener to the replclient */
             @Override
             public void onBlockUpdate(final BlockUpdateEvent event) { // Listens for a block update that has been watched or polled
                 System.out.println(String.format(
@@ -27,8 +28,6 @@ public class ReplCraftTest {
                         event.getLocation().getY(),
                         event.getLocation().getZ())
                 ); // Logs every block update
-
-                super.onBlockUpdate(event);
             }
 
             @Override
@@ -42,16 +41,19 @@ public class ReplCraftTest {
                         transaction.getQuery())
                 ); // Logs every transaction
 
-                replCraftClient.tell(transaction.getPlayer(),
-                        String.format(
-                                "You started a transaction with query: %s",
-                                transaction.getQuery()
-                        )
-                ); // Sends the player a message
+                try {
+                    replCraftClient.tell(transaction.getPlayer(),
+                            String.format(
+                                    "You started a transaction with query: %s",
+                                    transaction.getQuery()
+                            )
+                    ).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
 
                 transaction.deny(); // Denies the transaction, there will no money be taken from the player
 
-                super.onTransaction(transaction);
             }
         });
 
