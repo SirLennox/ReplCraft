@@ -14,7 +14,9 @@ import java.util.concurrent.ExecutionException;
 public class TreeBot {
 
     public static void main(String[] args) throws WebSocketException, ReplCraftError, IOException, ExecutionException, InterruptedException {
-        final ReplCraftClient client = new ReplCraftClient("eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4Ijo2MzUsInkiOjk1LCJ6IjoxNzkyLCJ1dWlkIjoiMTlkMzExN2ItODljMS00ODdjLTliNjAtODAwZmNmMmI0Mzk1IiwidXNlcm5hbWUiOiJTaXJMZW5ub3giLCJwZXJtaXNzaW9uIjoicGxheWVyIn0.94Gf602XlIPuhtDvqEO3vmU1DzueoMme9Iy8rEIPqfc");
+        final ReplCraftClient client = new ReplCraftClient(
+                /* A public token */ "eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4IjotNDAsInkiOjY1LCJ6IjotNjQsInV1aWQiOiIxOWQzMTE3Yi04OWMxLTQ4N2MtOWI2MC04MDBmY2YyYjQzOTUiLCJ1c2VybmFtZSI6IkBQVUJMSUMiLCJwZXJtaXNzaW9uIjoicHVibGljIn0.MzUQ-Z8Bsgsho_0WuZNcxb7RyHp2Yr_WoRruBTtuYH4"
+        );
 
         client.addListener(new ListenerAdapter() {
             @Override
