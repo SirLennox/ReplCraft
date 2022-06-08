@@ -1,6 +1,7 @@
 package dev.sirlennox.replcraftclient.api.event;
 
 import com.eclipsesource.json.JsonObject;
+import dev.sirlennox.replcraftclient.api.block.Block;
 import dev.sirlennox.replcraftclient.api.vector.IntVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,10 +13,10 @@ public class BlockUpdateEvent {
 
     private final IntVector location;
     private final Cause cause;
-    private final String block;
+    private final Block block;
     private final String oldBlock;
 
-    public BlockUpdateEvent(@NotNull final IntVector location, @NotNull final Cause cause, @NotNull final String block, @Nullable final String oldBlock) {
+    public BlockUpdateEvent(@NotNull final IntVector location, @NotNull final Cause cause, @NotNull final Block block, @Nullable final String oldBlock) {
         this.location = location;
         this.cause = cause;
         this.block = block;
@@ -30,7 +31,7 @@ public class BlockUpdateEvent {
                         json.get("z").asInt()
                 ),
                 Cause.getById(json.get("cause").asString()),
-                json.get("block").asString(),
+                Block.parse(json.get("block").asString()),
                 Objects.nonNull(json.get("old_block")) ? json.get("old_block").asString() : null
         );
     }
@@ -43,7 +44,7 @@ public class BlockUpdateEvent {
         return this.cause;
     }
 
-    public final @NotNull String getBlock() {
+    public final @NotNull Block getBlock() {
         return this.block;
     }
 
