@@ -483,7 +483,8 @@ public class ReplCraftClient {
         outputContainer.apply(data);
         final JsonArray ingredientsArray = new JsonArray();
         for (SlotReference ingredient : ingredients)
-            ingredientsArray.add(ingredient.toJson());
+            ingredientsArray.add(ingredient == null ? Json.NULL : ingredient.toJson());
+
         data.add("ingredients", ingredientsArray);
 
         this.send("craft", data).whenComplete(this.inheritException(callback, callback::complete));
