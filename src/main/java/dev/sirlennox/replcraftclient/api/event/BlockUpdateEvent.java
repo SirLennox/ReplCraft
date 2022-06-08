@@ -14,9 +14,9 @@ public class BlockUpdateEvent {
     private final IntVector location;
     private final Cause cause;
     private final Block block;
-    private final String oldBlock;
+    private final Block oldBlock;
 
-    public BlockUpdateEvent(@NotNull final IntVector location, @NotNull final Cause cause, @NotNull final Block block, @Nullable final String oldBlock) {
+    public BlockUpdateEvent(@NotNull final IntVector location, @NotNull final Cause cause, @NotNull final Block block, @Nullable final Block oldBlock) {
         this.location = location;
         this.cause = cause;
         this.block = block;
@@ -32,7 +32,7 @@ public class BlockUpdateEvent {
                 ),
                 Cause.getById(json.get("cause").asString()),
                 Block.parse(json.get("block").asString()),
-                Objects.nonNull(json.get("old_block")) ? json.get("old_block").asString() : null
+                Objects.nonNull(json.get("old_block")) ? Block.parse(json.get("old_block").asString()) : null
         );
     }
 
@@ -48,7 +48,7 @@ public class BlockUpdateEvent {
         return this.block;
     }
 
-    public final @Nullable String getOldBlock() {
+    public final @Nullable Block getOldBlock() {
         return this.oldBlock;
     }
 
