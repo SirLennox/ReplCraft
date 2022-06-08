@@ -24,10 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
@@ -43,7 +40,7 @@ public class ReplCraftClient {
     public ReplCraftClient(final ReplToken token) {
         this.token = token;
         this.nonce = 0;
-        this.listeners = new ArrayList<>();
+        this.listeners = Collections.synchronizedList(new ArrayList<>());
     }
 
     public ReplCraftClient(final String token) {
@@ -134,9 +131,7 @@ public class ReplCraftClient {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
-        data.add("x", location.getX());
-        data.add("y", location.getY());
-        data.add("z", location.getZ());
+        location.apply(data);
 
         data.add("blockData", block.toString());
 
@@ -553,7 +548,7 @@ public class ReplCraftClient {
     }
 
     public void callListener(final Consumer<? super IListener> consumer) {
-        this.listeners.forEach(consumer);
+        new Thread(() -> this.listeners.forEach(consumer), "Listener-Thread").start();
     }
 
     public final ReplToken getToken() {
