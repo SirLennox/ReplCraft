@@ -8,7 +8,6 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
 import dev.sirlennox.replcraftclient.api.Transaction;
 import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
-import dev.sirlennox.replcraftclient.api.listener.IListener;
 
 import java.util.Objects;
 

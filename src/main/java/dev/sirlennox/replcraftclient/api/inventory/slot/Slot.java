@@ -28,7 +28,8 @@ public class Slot extends SlotReference {
 
     /**
      * Moves the item in the slot to a specific container
-     * @param amount The amount that should be moved
+     *
+     * @param amount          The amount that should be moved
      * @param targetContainer The target container where the item should be moved in
      * @param targetItemIndex The item index in the target container where the item should be (If null: any)
      * @return Returns a response, useless

@@ -5,14 +5,18 @@ import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
 
 public class ListenerAdapter implements IListener {
     @Override
-    public void onBlockUpdate(final BlockUpdateEvent event) { }
+    public void onBlockUpdate(final BlockUpdateEvent event) {
+    }
 
     @Override
-    public void onTransaction(final Transaction transaction) { }
+    public void onTransaction(final Transaction transaction) {
+    }
 
     @Override
-    public void onDisconnect(final int statusCode) { }
+    public void onDisconnect(final int statusCode) {
+    }
 
     @Override
-    public void onConnect() { }
+    public void onConnect() {
+    }
 }

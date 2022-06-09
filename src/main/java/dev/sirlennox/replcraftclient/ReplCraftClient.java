@@ -55,6 +55,7 @@ public class ReplCraftClient {
         this.thread = null;
     }
 
+
     public ReplCraftClient(final ReplToken token) {
         this(token, true);
     }
@@ -63,7 +64,11 @@ public class ReplCraftClient {
         this(new ReplToken(token), autoReconnect);
     }
 
-    public CompletableFuture<ReplCraftClient> start() throws IOException, WebSocketException, ExecutionException, InterruptedException, ReplCraftError {
+    public ReplCraftClient(final String token) {
+        this(new ReplToken(token));
+    }
+
+    public CompletableFuture<ReplCraftClient> start() {
         final CompletableFuture<ReplCraftClient> finishCallback = new CompletableFuture<>();
 
         (this.thread = new Thread(() -> {

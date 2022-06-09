@@ -38,6 +38,7 @@ public class Item {
     public final int getDurability() {
         return this.durability;
     }
+
     public final String getType() {
         return this.type;
     }

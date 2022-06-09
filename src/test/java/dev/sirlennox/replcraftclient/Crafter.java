@@ -15,7 +15,7 @@ public class Crafter {
         replCraftClient.start().get();
 
         replCraftClient.craft(new IntVector(0, 0, 0),
-                new SlotReference[] {
+                new SlotReference[]{
                         new SlotReference(new IntVector(0, 1, 0), 0), null, null,
                         new SlotReference(new IntVector(0, 1, 0), 1), null, null,
                         null, null, null

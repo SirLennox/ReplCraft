@@ -3,7 +3,6 @@ package dev.sirlennox.replcraftclient;
 import com.neovisionaries.ws.client.WebSocketException;
 import dev.sirlennox.replcraftclient.api.Transaction;
 import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
-import dev.sirlennox.replcraftclient.api.listener.IListener;
 import dev.sirlennox.replcraftclient.api.listener.ListenerAdapter;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class Logger {
 
         });
 
-        replCraftClient.start().get(); // Starts and connects the replcraft client
+        replCraftClient.start().get(); // Starts and connects the ReplCraft client
 
     }
 }
