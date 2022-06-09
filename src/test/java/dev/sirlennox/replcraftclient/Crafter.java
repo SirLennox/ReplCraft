@@ -12,7 +12,7 @@ public class Crafter {
     public static void main(String[] args) throws ExecutionException, InterruptedException, WebSocketException, ReplCraftError, IOException {
         final ReplCraftClient replCraftClient = new ReplCraftClient("<Token>", true);
 
-        replCraftClient.start();
+        replCraftClient.start().get();
 
         replCraftClient.craft(new IntVector(0, 0, 0),
                 new SlotReference[] {

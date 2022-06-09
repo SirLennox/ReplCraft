@@ -39,6 +39,10 @@ public class ReplCraftClient {
     private int nonce;
     private final List<IListener> listeners;
     private final boolean autoReconnect;
+
+    /**
+     * Will queue packets while you are not connected and send them if you connected successfully
+     */
     private final Queue<QueuedMessage> sendQueue;
     private Thread thread;
 
@@ -47,7 +51,7 @@ public class ReplCraftClient {
         this.nonce = 0;
         this.listeners = Collections.synchronizedList(new ArrayList<>());
         this.sendQueue = new SynchronousQueue<>();
-        this.autoReconnect = false;
+        this.autoReconnect = autoReconnect;
         this.thread = null;
     }
 
@@ -73,7 +77,6 @@ public class ReplCraftClient {
                 if (this.isAutoReconnect())
                     this.webSocket.addListener(new WebSocketReconnectListener(this));
 
-
                 this.webSocket.connect();
 
                 final Response response = this.authenticate().get();
@@ -83,6 +86,7 @@ public class ReplCraftClient {
                     throw ReplCraftError.fromJson(response.getData());
 
                 this.sendQueue.forEach(queuedMessage -> this.send(queuedMessage.getAction(), queuedMessage.getData(), queuedMessage.isWaitForResponse(), queuedMessage.getCallback()));
+                this.callListener(IListener::onConnect);
                 finishCallback.complete(this);
             } catch (WebSocketException | ExecutionException | InterruptedException | IOException | ReplCraftError e) {
                 finishCallback.completeExceptionally(e);
@@ -98,6 +102,7 @@ public class ReplCraftClient {
         if (this.isConnected())
             this.webSocket.disconnect();
 
+        this.nonce = 0;
         this.webSocket = null;
         this.thread = null;
     }

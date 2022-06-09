@@ -3,7 +3,6 @@ package dev.sirlennox.replcraftclient.api.block;
 import dev.sirlennox.replcraftclient.api.Identifier;
 
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 public class Block {
 

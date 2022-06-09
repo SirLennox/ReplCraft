@@ -9,6 +9,10 @@ public interface IListener {
 
     void onTransaction(final Transaction transaction);
 
-    void onDisconnect();
+    void onDisconnect(final int statusCode);
 
+    /**
+     * WIll be called when the client connects, should be used for initial requests
+     */
+    void onConnect();
 }

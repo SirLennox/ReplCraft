@@ -23,7 +23,6 @@ public class WebSocketEventListener extends WebSocketAdapter {
     @Override
     public void onFrame(final WebSocket websocket, final WebSocketFrame frame) throws Exception {
         final JsonObject data = Json.parse(new String(frame.getPayload())).asObject();
-
         if (Objects.isNull(data.get("type")))
             return;
 
@@ -42,7 +41,7 @@ public class WebSocketEventListener extends WebSocketAdapter {
 
     @Override
     public void onDisconnected(final WebSocket websocket, final WebSocketFrame serverCloseFrame, final WebSocketFrame clientCloseFrame, final boolean closedByServer) throws Exception {
-        this.client.callListener(IListener::onDisconnect);
+        this.client.callListener(listener -> listener.onDisconnect(closedByServer ? serverCloseFrame.getCloseCode() : clientCloseFrame.getCloseCode()));
         super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
     }
 

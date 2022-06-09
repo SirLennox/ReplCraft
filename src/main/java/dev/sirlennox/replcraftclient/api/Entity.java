@@ -4,7 +4,6 @@ import com.eclipsesource.json.JsonObject;
 import dev.sirlennox.replcraftclient.api.vector.DoubleVector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 

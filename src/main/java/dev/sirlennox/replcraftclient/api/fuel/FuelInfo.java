@@ -4,7 +4,6 @@ import com.eclipsesource.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 

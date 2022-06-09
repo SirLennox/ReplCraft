@@ -11,5 +11,8 @@ public class ListenerAdapter implements IListener {
     public void onTransaction(final Transaction transaction) { }
 
     @Override
-    public void onDisconnect() { }
+    public void onDisconnect(final int statusCode) { }
+
+    @Override
+    public void onConnect() { }
 }

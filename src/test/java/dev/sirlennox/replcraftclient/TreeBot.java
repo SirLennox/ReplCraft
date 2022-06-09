@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TreeBot {
 
     public static void main(String[] args) throws WebSocketException, ReplCraftError, IOException, ExecutionException, InterruptedException {
-        final ReplCraftClient client = new ReplCraftClient("eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4Ijo2MzUsInkiOjk1LCJ6IjoxNzkyLCJ1dWlkIjoiMTlkMzExN2ItODljMS00ODdjLTliNjAtODAwZmNmMmI0Mzk1IiwidXNlcm5hbWUiOiJTaXJMZW5ub3giLCJwZXJtaXNzaW9uIjoicGxheWVyIn0.94Gf602XlIPuhtDvqEO3vmU1DzueoMme9Iy8rEIPqfc", true);
+        final ReplCraftClient client = new ReplCraftClient("<Token>", true);
         final IntVector treeLocation = new IntVector(2, 1, 2);
         final IntVector saplingLocation = new IntVector(2, 0, 2);
         AtomicReference<IntVector> size = new AtomicReference<>();
@@ -44,14 +44,18 @@ public class TreeBot {
             }
 
             @Override
-            public void onDisconnect() {
-                super.onDisconnect();
+            public void onConnect() {
+                try {
+                    size.set(client.getSize(0, 0, 0).get());
+                    client.poll(treeLocation).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+                super.onConnect();
             }
         });
 
         client.start().get();
-        size.set(client.getSize(0, 0, 0).get());
-        client.poll(treeLocation).get();
     }
 
 }
