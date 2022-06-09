@@ -10,9 +10,7 @@ import java.util.concurrent.ExecutionException;
 public class Crafter {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, WebSocketException, ReplCraftError, IOException {
-        final ReplCraftClient replCraftClient = new ReplCraftClient(
-                /* A public token */ "eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4IjotNDAsInkiOjY1LCJ6IjotNjQsInV1aWQiOiIxOWQzMTE3Yi04OWMxLTQ4N2MtOWI2MC04MDBmY2YyYjQzOTUiLCJ1c2VybmFtZSI6IkBQVUJMSUMiLCJwZXJtaXNzaW9uIjoicHVibGljIn0.MzUQ-Z8Bsgsho_0WuZNcxb7RyHp2Yr_WoRruBTtuYH4"
-        );
+        final ReplCraftClient replCraftClient = new ReplCraftClient("<Token>", true);
 
         replCraftClient.start();
 

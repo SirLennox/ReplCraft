@@ -8,6 +8,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
 import dev.sirlennox.replcraftclient.api.Transaction;
 import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
+import dev.sirlennox.replcraftclient.api.listener.IListener;
 
 import java.util.Objects;
 
@@ -37,6 +38,12 @@ public class WebSocketEventListener extends WebSocketAdapter {
         }
 
         super.onFrame(websocket, frame);
+    }
+
+    @Override
+    public void onDisconnected(final WebSocket websocket, final WebSocketFrame serverCloseFrame, final WebSocketFrame clientCloseFrame, final boolean closedByServer) throws Exception {
+        this.client.callListener(IListener::onDisconnect);
+        super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
     }
 
     public final ReplCraftClient getClient() {

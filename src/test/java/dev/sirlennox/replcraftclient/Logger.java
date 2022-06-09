@@ -12,9 +12,7 @@ public class Logger {
 
     public static void main(String[] args) throws WebSocketException, IOException, ReplCraftError, ExecutionException, InterruptedException {
 
-        final ReplCraftClient replCraftClient = new ReplCraftClient(
-                /* A public token */ "eyJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMzQuNjkuMjM5LjEzMjoyODA4MCIsIndvcmxkIjoid29ybGQiLCJ4IjotNDAsInkiOjY1LCJ6IjotNjQsInV1aWQiOiIxOWQzMTE3Yi04OWMxLTQ4N2MtOWI2MC04MDBmY2YyYjQzOTUiLCJ1c2VybmFtZSI6IkBQVUJMSUMiLCJwZXJtaXNzaW9uIjoicHVibGljIn0.MzUQ-Z8Bsgsho_0WuZNcxb7RyHp2Yr_WoRruBTtuYH4"
-        );
+        final ReplCraftClient replCraftClient = new ReplCraftClient("<Token>", true);
 
         replCraftClient.addListener(new IListener() { /* Adds an event listener to the replclient */
             @Override
@@ -54,10 +52,15 @@ public class Logger {
 
                 transaction.deny(); // Denies the transaction, there will no money be taken from the player
             }
+
+            @Override
+            public void onDisconnect() {
+
+            }
         });
 
-        replCraftClient.start(); // Starts and connects the replcraft client
-
+        replCraftClient.start().get(); // Starts and connects the replcraft client
+        replCraftClient.watchAll().get();
 
     }
 }

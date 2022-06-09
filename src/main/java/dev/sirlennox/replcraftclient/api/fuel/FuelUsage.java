@@ -6,10 +6,10 @@ import org.jetbrains.annotations.NotNull;
 public class FuelUsage {
 
     private final String endpoint;
-    private final int second;
-    private final int minute;
+    private final double second;
+    private final double minute;
 
-    public FuelUsage(final String endpoint, final int second, final int minute) {
+    public FuelUsage(final String endpoint, final double second, final double minute) {
         this.endpoint = endpoint;
         this.second = second;
         this.minute = minute;
@@ -18,8 +18,8 @@ public class FuelUsage {
     public static FuelUsage fromJson(@NotNull final String endpoint, @NotNull final JsonObject json) {
         return new FuelUsage(
                 endpoint,
-                json.get("second").asInt(),
-                json.get("minute").asInt()
+                json.get("second").asDouble(),
+                json.get("minute").asDouble()
         );
     }
 
@@ -27,11 +27,11 @@ public class FuelUsage {
         return this.endpoint;
     }
 
-    public final int getSecond() {
+    public final double getSecond() {
         return this.second;
     }
 
-    public final int getMinute() {
+    public final double getMinute() {
         return this.minute;
     }
 }

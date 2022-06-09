@@ -18,6 +18,7 @@ import dev.sirlennox.replcraftclient.api.vector.IntVector;
 import dev.sirlennox.replcraftclient.connection.exchange.Request;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
 import dev.sirlennox.replcraftclient.connection.listener.WebSocketEventListener;
+import dev.sirlennox.replcraftclient.connection.listener.WebSocketReconnectListener;
 import dev.sirlennox.replcraftclient.connection.listener.WebSocketResponseListener;
 import dev.sirlennox.replcraftclient.token.ReplToken;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.SynchronousQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -36,31 +38,68 @@ public class ReplCraftClient {
     private WebSocket webSocket;
     private int nonce;
     private final List<IListener> listeners;
+    private final boolean autoReconnect;
+    private final Queue<QueuedMessage> sendQueue;
+    private Thread thread;
 
-    public ReplCraftClient(final ReplToken token) {
+    public ReplCraftClient(final ReplToken token, final boolean autoReconnect) {
         this.token = token;
         this.nonce = 0;
         this.listeners = Collections.synchronizedList(new ArrayList<>());
+        this.sendQueue = new SynchronousQueue<>();
+        this.autoReconnect = false;
+        this.thread = null;
     }
 
-    public ReplCraftClient(final String token) {
-        this(new ReplToken(token));
+    public ReplCraftClient(final ReplToken token) {
+        this(token, true);
     }
 
-    public void start() throws IOException, WebSocketException, ExecutionException, InterruptedException, ReplCraftError {
-        this.webSocket = new WebSocketFactory()
-                .setVerifyHostname(false)
-                .createSocket(String.format("ws://%s/gateway", this.token.getHost()));
+    public ReplCraftClient(final String token, final boolean autoReconnect) {
+        this(new ReplToken(token), autoReconnect);
+    }
 
-        this.webSocket.addListener(new WebSocketEventListener(this));
+    public CompletableFuture<ReplCraftClient> start() throws IOException, WebSocketException, ExecutionException, InterruptedException, ReplCraftError {
+        final CompletableFuture<ReplCraftClient> finishCallback = new CompletableFuture<>();
 
-        this.webSocket.connect();
+        (this.thread = new Thread(() -> {
+            try {
+                this.webSocket = new WebSocketFactory()
+                        .setVerifyHostname(false)
+                        .createSocket(String.format("ws://%s/gateway", this.token.getHost()));
 
-        final Response response = this.authenticate().get();
+                this.webSocket.addListener(new WebSocketEventListener(this));
 
-        if (!response.isOk())
-            throw ReplCraftError.fromJson(response.getData());
+                if (this.isAutoReconnect())
+                    this.webSocket.addListener(new WebSocketReconnectListener(this));
 
+
+                this.webSocket.connect();
+
+                final Response response = this.authenticate().get();
+
+
+                if (!response.isOk())
+                    throw ReplCraftError.fromJson(response.getData());
+
+                this.sendQueue.forEach(queuedMessage -> this.send(queuedMessage.getAction(), queuedMessage.getData(), queuedMessage.isWaitForResponse(), queuedMessage.getCallback()));
+                finishCallback.complete(this);
+            } catch (WebSocketException | ExecutionException | InterruptedException | IOException | ReplCraftError e) {
+                finishCallback.completeExceptionally(e);
+            }
+        })).start();
+
+        return finishCallback;
+    }
+
+    public void close() {
+        if (this.thread.isAlive() || !this.thread.isInterrupted())
+            this.thread.interrupt();
+        if (this.isConnected())
+            this.webSocket.disconnect();
+
+        this.webSocket = null;
+        this.thread = null;
     }
 
 
@@ -101,6 +140,7 @@ public class ReplCraftClient {
 
     /**
      * Retrieves the inner size of the structure
+     *
      * @param x The inner size of the structure in the x coordinate
      * @param y The inner size of the structure in the y coordinate
      * @param z The inner size of the structure in the z coordinate
@@ -120,12 +160,17 @@ public class ReplCraftClient {
         return callback;
     }
 
+    public CompletableFuture<IntVector> getSize() {
+        return this.getSize(0, 0, 0);
+    }
+
     /**
      * Sets a block inside your structure
-     * @param location The location of the block (structure relative)
-     * @param block The block identifier
+     *
+     * @param location        The location of the block (structure relative)
+     * @param block           The block identifier
      * @param sourceContainer The block that will be moved (if null : will be taken from the structure inventory)
-     * @param dropsContainer If a block is being placed, the drops of it will be stored in the given container block (if null: will be put in the structure inventory)
+     * @param dropsContainer  If a block is being placed, the drops of it will be stored in the given container block (if null: will be put in the structure inventory)
      */
     public CompletableFuture<Response> setBlock(@NotNull final IntVector location, @NotNull final Block block, @Nullable final IntVector sourceContainer, @Nullable final IntVector dropsContainer) {
         final JsonObject data = new JsonObject();
@@ -173,7 +218,7 @@ public class ReplCraftClient {
 
     /**
      * @param location The location of the sign
-     * @param lines The lines of the new sign text (must be 4)
+     * @param lines    The lines of the new sign text (must be 4)
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> setSignText(@NotNull final IntVector location, @NotNull final String[] lines) {
@@ -198,6 +243,7 @@ public class ReplCraftClient {
 
     /**
      * Watches the given block for updates
+     *
      * @param location The location of the block to watch, structure relative
      * @return Returns a response, useless
      */
@@ -214,6 +260,7 @@ public class ReplCraftClient {
 
     /**
      * Stops watching the given block for updates
+     *
      * @param location The location of the block to unwatch, structure relative
      * @return Returns a response, useless
      */
@@ -230,6 +277,7 @@ public class ReplCraftClient {
 
     /**
      * Watches all blocks for updates
+     *
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> watchAll() {
@@ -242,6 +290,7 @@ public class ReplCraftClient {
 
     /**
      * Stops watching all blocks for updates
+     *
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> unwatchAll() {
@@ -259,6 +308,7 @@ public class ReplCraftClient {
      * The more blocks you poll, the slower each individual block will be checked.
      * Additionally, if a block changes multiple times between polls, only the latest change
      * will be reported.
+     *
      * @param location The location of the block to poll
      * @return Returns a response, useless
      */
@@ -275,6 +325,7 @@ public class ReplCraftClient {
 
     /**
      * Stops polling a block for updates.
+     *
      * @param location The location of the block to unpoll
      * @return Returns a response, useless
      */
@@ -291,6 +342,7 @@ public class ReplCraftClient {
 
     /**
      * Begins polling all blocks in the structure for updates.
+     *
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> pollAll() {
@@ -303,6 +355,7 @@ public class ReplCraftClient {
 
     /**
      * Stops polling all blocks in the structure for updates.
+     *
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> unpollAll() {
@@ -340,9 +393,10 @@ public class ReplCraftClient {
 
     /**
      * Moves an item from one container to another
+     *
      * @param sourceContainer The source container location where the item is from
-     * @param itemIndex The slot index of the item
-     * @param amount The amount of the item (if null: all)
+     * @param itemIndex       The slot index of the item
+     * @param amount          The amount of the item (if null: all)
      * @param targetContainer The target container location where the item is being moved to
      * @param targetItemIndex The target slot index of the item (if null: any)
      * @return Returns a response, useless
@@ -375,6 +429,7 @@ public class ReplCraftClient {
 
     /**
      * Gets the redstone power level of a block
+     *
      * @param location Structure relative location of target block
      * @return Returns redstone power level
      */
@@ -392,7 +447,8 @@ public class ReplCraftClient {
     /**
      * Send a message to a player
      * Must be online and in the structure
-     * @param target UUID or username of the player
+     *
+     * @param target  UUID or username of the player
      * @param message The message to send
      * @return Returns a response, useless
      */
@@ -420,6 +476,7 @@ public class ReplCraftClient {
     /**
      * Sends money to a player from your own account
      * Must be online and in the structure
+     *
      * @param target UUID or username of the player
      * @param amount The amount of money
      * @return Returns a response, useless
@@ -473,8 +530,9 @@ public class ReplCraftClient {
 
     /**
      * Responds to an active transaction
+     *
      * @param queryNonce The nonce of the transaction
-     * @param accept True if the transaction was accepted
+     * @param accept     True if the transaction was accepted
      */
     public void respondToTransaction(final int queryNonce, final boolean accept) {
         final JsonObject data = new JsonObject();
@@ -501,13 +559,17 @@ public class ReplCraftClient {
         return callback;
     }
 
-    private CompletableFuture<Response> send(@NotNull final String action, @Nullable final JsonObject data, final boolean waitForResponse) {
+    private CompletableFuture<Response> send(@NotNull final String action, @Nullable final JsonObject data, final boolean waitForResponse, final CompletableFuture<Response> callback) {
+        if (!this.isConnected()) {
+            this.sendQueue.offer(new QueuedMessage(callback, action, data, waitForResponse));
+            return callback;
+        }
 
         final Request request = new Request(this.nonce++, action, Objects.isNull(data) ? new JsonObject() : data);
         this.webSocket.sendText(request.toJson().toString());
 
         if (waitForResponse) {
-            final CompletableFuture<Response> callback = new CompletableFuture<>();
+
             final WebSocketResponseListener responseListener = new WebSocketResponseListener(request.getNonce(), (response, instance) -> {
                 if (!response.isOk()) {
                     callback.completeExceptionally(ReplCraftError.fromJson(response.getData()));
@@ -524,12 +586,16 @@ public class ReplCraftClient {
         return null;
     }
 
+    private CompletableFuture<Response> send(@NotNull final String action, @Nullable final JsonObject data, final boolean waitForResponse) {
+        return this.send(action, data, waitForResponse, new CompletableFuture<>());
+    }
+
     private CompletableFuture<Response> send(@NotNull final String action, @Nullable final JsonObject data) {
         return this.send(action, data, true);
     }
 
 
-    private  <T> BiConsumer<? super T, Throwable> inheritException(final CompletableFuture<?> callback, final Consumer<? super T> consumer) {
+    private <T> BiConsumer<? super T, Throwable> inheritException(final CompletableFuture<?> callback, final Consumer<? super T> consumer) {
         return (object, throwable) -> {
             if (Objects.nonNull(throwable)) {
                 callback.completeExceptionally(throwable);
@@ -561,5 +627,43 @@ public class ReplCraftClient {
 
     public final boolean isConnected() {
         return Objects.nonNull(this.webSocket) && this.webSocket.isOpen();
+    }
+
+    public final boolean isAutoReconnect() {
+        return this.autoReconnect;
+    }
+
+    public final Thread getThread() {
+        return this.thread;
+    }
+
+    public static class QueuedMessage {
+        private final CompletableFuture<Response> callback;
+        private final String action;
+        private final JsonObject data;
+        private final boolean waitForResponse;
+
+        public QueuedMessage(final CompletableFuture<Response> callback, final String action, final JsonObject data, final boolean waitForResponse) {
+            this.callback = callback;
+            this.action = action;
+            this.data = data;
+            this.waitForResponse = waitForResponse;
+        }
+
+        public final String getAction() {
+            return this.action;
+        }
+
+        public final JsonObject getData() {
+            return this.data;
+        }
+
+        public final boolean isWaitForResponse() {
+            return this.waitForResponse;
+        }
+
+        public final CompletableFuture<Response> getCallback() {
+            return this.callback;
+        }
     }
 }

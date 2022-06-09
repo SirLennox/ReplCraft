@@ -9,4 +9,6 @@ public interface IListener {
 
     void onTransaction(final Transaction transaction);
 
+    void onDisconnect();
+
 }

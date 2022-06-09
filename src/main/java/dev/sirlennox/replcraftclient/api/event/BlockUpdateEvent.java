@@ -54,7 +54,7 @@ public class BlockUpdateEvent {
 
 
     public enum Cause {
-        BREAK("break"), PLACE("place"), POLL("poll"), UNKNOWN(null);
+        BREAK("break"), PLACE("place"), POLL("poll"), BURN("burn"), EXPLODE("explode"), FADE("fade"), GROW("grow"), IGNITE("ignite"), PISTON_EXTEND("piston_extend"), PISTON_RETRACT("piston_retract"), FLUID("fluid"), DECAY("decay"), REDSTONE("redstone"), UNKNOWN(null);
 
         private final String id;
 

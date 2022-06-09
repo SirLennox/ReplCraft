@@ -9,4 +9,7 @@ public class ListenerAdapter implements IListener {
 
     @Override
     public void onTransaction(final Transaction transaction) { }
+
+    @Override
+    public void onDisconnect() { }
 }
