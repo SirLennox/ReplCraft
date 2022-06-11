@@ -1,6 +1,7 @@
 package dev.sirlennox.replcraftclient.api.inventory.item;
 
 import com.eclipsesource.json.JsonObject;
+import dev.sirlennox.replcraftclient.api.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public class Item {
@@ -8,9 +9,9 @@ public class Item {
     private final int maxDurability;
     private final int amount;
     private final int durability;
-    private final String type;
+    private final Identifier type;
 
-    public Item(final int maxDurability, final int durability, final int amount, final String type) {
+    public Item(final int maxDurability, final int durability, final int amount, final Identifier type) {
         this.maxDurability = maxDurability;
         this.amount = amount;
         this.durability = durability;
@@ -22,7 +23,7 @@ public class Item {
                 json.get("maxDurability").asInt(),
                 json.get("durability").asInt(),
                 json.get("amount").asInt(),
-                json.get("type").asString()
+                Identifier.parse(json.get("type").asString())
         );
     }
 
@@ -39,7 +40,7 @@ public class Item {
         return this.durability;
     }
 
-    public final String getType() {
+    public final Identifier getType() {
         return this.type;
     }
 }

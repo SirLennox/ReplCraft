@@ -46,7 +46,7 @@ public class TreeBot {
             @Override
             public void onConnect() {
                 try {
-                    size.set(client.getSize(0, 0, 0).get());
+                    size.set(client.getSize().get());
                     client.poll(treeLocation).get();
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
