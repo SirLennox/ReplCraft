@@ -27,6 +27,16 @@ public class Identifier {
         return String.format("%s:%s", this.namespace, this.identifier);
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Identifier))
+            return super.equals(obj);
+
+        final Identifier identifier = (Identifier) obj;
+
+        return super.equals(obj) || (identifier.getIdentifier().equals(this.identifier) && identifier.getNamespace().equals(this.namespace));
+    }
+
     public final String getIdentifier() {
         return this.identifier;
     }
