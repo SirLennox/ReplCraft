@@ -36,6 +36,6 @@ public abstract class Vector<T extends Number> {
 
         final Vector<?> vector = (Vector<?>) obj;
 
-        return super.equals(obj) || (vector.getX().equals(this.getX()) && vector.getY().equals(this.getX()) && vector.getZ().equals(this.getZ()));
+        return super.equals(obj) || (vector.getX().equals(this.getX()) && vector.getY().equals(this.getY()) && vector.getZ().equals(this.getZ()));
     }
 }
