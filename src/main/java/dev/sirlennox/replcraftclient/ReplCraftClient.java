@@ -624,7 +624,10 @@ public class ReplCraftClient {
     }
 
     public void callListener(final Consumer<? super IListener> consumer) {
-        new Thread(() -> this.listeners.forEach(consumer), "Listener-Thread").start();
+        new Thread(() -> {
+            for (IListener listener : this.listeners)
+                consumer.accept(listener);
+        }, "Listener-Thread").start();
     }
 
     public final ReplToken getToken() {
