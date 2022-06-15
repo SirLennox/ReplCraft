@@ -15,6 +15,7 @@ import dev.sirlennox.replcraftclient.api.inventory.slot.ItemSlot;
 import dev.sirlennox.replcraftclient.api.inventory.slot.SlotReference;
 import dev.sirlennox.replcraftclient.api.listener.IListener;
 import dev.sirlennox.replcraftclient.api.vector.IntVector;
+import dev.sirlennox.replcraftclient.command.CommandSystem;
 import dev.sirlennox.replcraftclient.connection.exchange.Request;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
 import dev.sirlennox.replcraftclient.connection.listener.WebSocketEventListener;
@@ -39,6 +40,7 @@ public class ReplCraftClient {
     private int nonce;
     private final List<IListener> listeners;
     private final boolean autoReconnect;
+    private final CommandSystem commandSystem;
 
     /**
      * Will queue packets while you are not connected and send them if you connected successfully
@@ -49,7 +51,9 @@ public class ReplCraftClient {
     public ReplCraftClient(final ReplToken token, final boolean autoReconnect) {
         this.token = token;
         this.nonce = 0;
+        this.commandSystem = new CommandSystem();
         this.listeners = Collections.synchronizedList(new ArrayList<>());
+        this.addListener(this.commandSystem.createListener());
         this.sendQueue = new SynchronousQueue<>();
         this.autoReconnect = autoReconnect;
         this.thread = null;
@@ -648,6 +652,10 @@ public class ReplCraftClient {
 
     public final Thread getThread() {
         return this.thread;
+    }
+
+    public final CommandSystem getCommandSystem() {
+        return this.commandSystem;
     }
 
     public static class QueuedMessage {

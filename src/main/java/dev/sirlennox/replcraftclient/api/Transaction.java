@@ -2,9 +2,11 @@ package dev.sirlennox.replcraftclient.api;
 
 import com.eclipsesource.json.JsonObject;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
+import dev.sirlennox.replcraftclient.connection.exchange.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class Transaction {
 
@@ -30,6 +32,9 @@ public class Transaction {
         this.client.respondToTransaction(this.nonce, false);
     }
 
+    public CompletableFuture<Response> tell(final String message) {
+        return this.client.tell(this.getPlayer(), message);
+    }
 
     public static Transaction fromJson(@NotNull final ReplCraftClient client, @NotNull final JsonObject json) throws NumberFormatException {
         return new Transaction(
