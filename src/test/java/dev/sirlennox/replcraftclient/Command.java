@@ -8,7 +8,7 @@ public class Command {
     public static void main(String... arguments) throws ExecutionException, InterruptedException {
         final ReplCraftClient client = new ReplCraftClient("<Token>", true);
         client.getCommandSystem().registerCommand("test", ((args, transaction) -> {
-            transaction.tell(String.format("Your arguments: %s", Arrays.toString(args)));
+            transaction.tell(String.format("Transaction Amount: %s, Arguments: %s", transaction.getAmount(), Arrays.toString(args))).join();
             transaction.accept();
         }));
 

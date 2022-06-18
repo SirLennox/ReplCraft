@@ -488,6 +488,43 @@ public class ReplCraftClient {
     }
 
     /**
+     * Will split the messages at a specified0 characters limit and send them seperately
+     * @param target UUID or username of the player
+     * @param message The message that will be sent to the player; will be splitted
+     * @param maxSize The max size of the string; will be splitted by that amount
+     */
+    public void tellWithSplitMessages(final String target, final String message, final int maxSize) {
+        final List<String> pieces = new ArrayList<>();
+        for (int i = 0; i < message.length(); i += maxSize) {
+            pieces.add(message.substring(i, Math.min(i + maxSize, message.length())));
+        }
+
+        for (final String piece : pieces) {
+            this.tell(target, piece);
+        }
+    }
+
+    public void tellWithSplitMessages(final String target, final String message) {
+        this.tellWithSplitMessages(target, message, 1000);
+    }
+
+    public void tellWithSplitMessages(final UUID target, final String message, final int maxSize) {
+        this.tellWithSplitMessages(target.toString(), message, maxSize);
+    }
+
+    public void tellWithSplitMessages(final UUID target, final String message) {
+        this.tellWithSplitMessages(target.toString(), message, 1000);
+    }
+
+    public void tellWithSplitMessages(final GameProfile target, final String message, final int maxSize) {
+        this.tellWithSplitMessages(target.getUuid(), message, maxSize);
+    }
+
+    public void tellWithSplitMessages(final GameProfile target, final String message) {
+        this.tellWithSplitMessages(target, message, 1000);
+    }
+
+    /**
      * Sends money to a player from your own account
      * Must be online and in the structure
      *
