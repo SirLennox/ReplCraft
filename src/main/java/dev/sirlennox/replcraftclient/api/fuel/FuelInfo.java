@@ -11,9 +11,11 @@ public class FuelInfo {
 
     private final HashMap<String, FuelAPIInfo> apis;
     private final List<Connection> connections;
+    private final List<FuelInfoStrategy> strategies;
 
-    public FuelInfo(final HashMap<String, FuelAPIInfo> apis, final List<Connection> connections) {
+    public FuelInfo(final HashMap<String, FuelAPIInfo> apis, final List<FuelInfoStrategy> strategies, final List<Connection> connections) {
         this.apis = apis;
+        this.strategies = strategies;
         this.connections = connections;
     }
 
@@ -22,6 +24,7 @@ public class FuelInfo {
         json.get("apis").asObject().iterator().forEachRemaining(member -> apis.put(member.getName(), FuelAPIInfo.fromJson(member.getName(), member.getValue().asObject())));
         return new FuelInfo(
                 apis,
+                json.get("strategies").asArray().values().stream().map(jsonValue -> FuelInfoStrategy.fromJson(jsonValue.asObject())).collect(Collectors.toList()),
                 json.get("connections").asArray().values().stream().map(jsonValue -> Connection.fromJson(jsonValue.asObject())).collect(Collectors.toList())
         );
     }
@@ -32,5 +35,9 @@ public class FuelInfo {
 
     public final List<Connection> getConnections() {
         return this.connections;
+    }
+
+    public final List<FuelInfoStrategy> getStrategies() {
+        return this.strategies;
     }
 }
