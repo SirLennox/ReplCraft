@@ -36,12 +36,12 @@ public class Transaction {
         return this.client.tell(this.getPlayer(), message);
     }
 
-    public void tellWithSplitMessages(final String message, final int maxSIze) {
-        this.client.tellWithSplitMessages(this.getPlayer(), message);
+    public void tellWithSplitMessages(final int maxSize, final String... parts) {
+        this.client.tellWithSplitMessages(this.getPlayer(), maxSize, parts);
     }
 
-    public void tellWithSplitMessages(final String message) {
-        this.client.tellWithSplitMessages(this.getPlayer(), message);
+    public void tellWithSplitMessages(final String... parts) {
+        this.client.tellWithSplitMessages(this.getPlayer(), parts);
     }
 
     public static Transaction fromJson(@NotNull final ReplCraftClient client, @NotNull final JsonObject json) throws NumberFormatException {

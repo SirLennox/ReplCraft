@@ -488,15 +488,36 @@ public class ReplCraftClient {
     }
 
     /**
-     * Will split the messages at a specified0 characters limit and send them seperately
+     * Will split the message at a specified characters limit and send them seperately, will try to avoid splitting the parts
      * @param target UUID or username of the player
-     * @param message The message that will be sent to the player; will be splitted
+     * @param parts The parts that should not be splitted (for color codes or other things)
      * @param maxSize The max size of the string; will be splitted by that amount
      */
-    public void tellWithSplitMessages(final String target, final String message, final int maxSize) {
+    public void tellWithSplitMessages(final String target, final int maxSize, final String... parts) {
+        final StringBuilder stringBuilder = new StringBuilder();
         final List<String> pieces = new ArrayList<>();
-        for (int i = 0; i < message.length(); i += maxSize) {
-            pieces.add(message.substring(i, Math.min(i + maxSize, message.length())));
+
+        for(final String message : parts) {
+            if (message.length() + stringBuilder.length() > maxSize) {
+                if (!stringBuilder.toString().isEmpty()) {
+                    pieces.add(stringBuilder.toString());
+                    stringBuilder.setLength(0);
+                }
+                if (message.length() > maxSize) {
+                    for (int i = 0; i < message.length(); i += maxSize) {
+                        pieces.add(message.substring(i, Math.min(i + maxSize, message.length())));
+                    }
+                } else {
+                    stringBuilder.append(message);
+                }
+            } else {
+                stringBuilder.append(message);
+            }
+        }
+
+        if (!stringBuilder.toString().isEmpty()) {
+            pieces.add(stringBuilder.toString());
+            stringBuilder.setLength(0);
         }
 
         for (final String piece : pieces) {
@@ -504,24 +525,24 @@ public class ReplCraftClient {
         }
     }
 
-    public void tellWithSplitMessages(final String target, final String message) {
-        this.tellWithSplitMessages(target, message, 1000);
+    public void tellWithSplitMessages(final String target, final String... parts) {
+        this.tellWithSplitMessages(target, 1000, parts);
     }
 
-    public void tellWithSplitMessages(final UUID target, final String message, final int maxSize) {
-        this.tellWithSplitMessages(target.toString(), message, maxSize);
+    public void tellWithSplitMessages(final UUID target, final int maxSize, final String... parts) {
+        this.tellWithSplitMessages(target.toString(), maxSize, parts);
     }
 
-    public void tellWithSplitMessages(final UUID target, final String message) {
-        this.tellWithSplitMessages(target.toString(), message, 1000);
+    public void tellWithSplitMessages(final UUID target, final String... parts) {
+        this.tellWithSplitMessages(target.toString(), 1000, parts);
     }
 
-    public void tellWithSplitMessages(final GameProfile target, final String message, final int maxSize) {
-        this.tellWithSplitMessages(target.getUuid(), message, maxSize);
+    public void tellWithSplitMessages(final GameProfile target, final int maxSize, final String... parts) {
+        this.tellWithSplitMessages(target.getUuid(), maxSize, parts);
     }
 
-    public void tellWithSplitMessages(final GameProfile target, final String message) {
-        this.tellWithSplitMessages(target, message, 1000);
+    public void tellWithSplitMessages(final GameProfile target, final String... parts) {
+        this.tellWithSplitMessages(target, 1000, parts);
     }
 
     /**
