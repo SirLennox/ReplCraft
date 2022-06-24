@@ -2,7 +2,7 @@ package dev.sirlennox.replcraftclient.api.inventory.slot;
 
 import com.eclipsesource.json.JsonObject;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
-import dev.sirlennox.replcraftclient.api.vector.IntVector;
+import dev.sirlennox.replcraftclient.api.vector.Location;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,12 +13,12 @@ public class Slot extends SlotReference {
 
     private final ReplCraftClient client;
 
-    public Slot(final ReplCraftClient client, final IntVector source, final int index) {
+    public Slot(final ReplCraftClient client, final Location source, final int index) {
         super(source, index);
         this.client = client;
     }
 
-    public static Slot fromJson(@NotNull final ReplCraftClient client, @NotNull final IntVector source, @NotNull final JsonObject json) {
+    public static Slot fromJson(@NotNull final ReplCraftClient client, @NotNull final Location source, @NotNull final JsonObject json) {
         return new Slot(
                 client,
                 source,
@@ -34,15 +34,15 @@ public class Slot extends SlotReference {
      * @param targetItemIndex The item index in the target container where the item should be (If null: any)
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final IntVector targetContainer, @Nullable Integer targetItemIndex) {
+    public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final Location targetContainer, @Nullable Integer targetItemIndex) {
         return this.client.moveItem(this.getSource(), this.getIndex(), amount, targetContainer, targetItemIndex);
     }
 
-    public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final IntVector targetContainer) {
+    public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final Location targetContainer) {
         return this.moveTo(amount, targetContainer, null);
     }
 
-    public CompletableFuture<Response> moveTo(@NotNull final IntVector targetContainer) {
+    public CompletableFuture<Response> moveTo(@NotNull final Location targetContainer) {
         return this.moveTo(null, targetContainer);
     }
 

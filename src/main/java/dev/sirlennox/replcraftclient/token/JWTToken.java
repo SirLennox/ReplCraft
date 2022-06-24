@@ -28,7 +28,6 @@ public class JWTToken {
         return this.getSequence(2);
     }
 
-
     public final @NotNull String[] splitSequences() {
         return this.token.split("\\.");
     }

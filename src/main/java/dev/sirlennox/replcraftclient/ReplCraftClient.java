@@ -14,7 +14,7 @@ import dev.sirlennox.replcraftclient.api.fuel.FuelInfo;
 import dev.sirlennox.replcraftclient.api.inventory.slot.ItemSlot;
 import dev.sirlennox.replcraftclient.api.inventory.slot.SlotReference;
 import dev.sirlennox.replcraftclient.api.listener.IListener;
-import dev.sirlennox.replcraftclient.api.vector.IntVector;
+import dev.sirlennox.replcraftclient.api.vector.Location;
 import dev.sirlennox.replcraftclient.command.CommandSystem;
 import dev.sirlennox.replcraftclient.connection.exchange.Request;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
@@ -58,7 +58,6 @@ public class ReplCraftClient {
         this.autoReconnect = autoReconnect;
         this.thread = null;
     }
-
 
     public ReplCraftClient(final ReplToken token) {
         this(token, true);
@@ -130,16 +129,16 @@ public class ReplCraftClient {
      * @param z Structure relative Z
      * @return Returns the world relative location of the structure relative location
      */
-    public CompletableFuture<IntVector> getWorldLocation(final int x, final int y, final int z) {
+    public CompletableFuture<Location> getWorldLocation(final int x, final int y, final int z) {
         final JsonObject data = new JsonObject();
         data.add("x", x);
         data.add("y", y);
         data.add("z", z);
 
-        final CompletableFuture<IntVector> callback = new CompletableFuture<>();
+        final CompletableFuture<Location> callback = new CompletableFuture<>();
         this.send("get_location", data).whenComplete(this.inheritException(callback, response -> {
             final JsonObject responseData = response.getData();
-            callback.complete(new IntVector(responseData.get("x").asInt(), responseData.get("y").asInt(), responseData.get("z").asInt()));
+            callback.complete(new Location(responseData.get("x").asInt(), responseData.get("y").asInt(), responseData.get("z").asInt()));
         }));
 
         return callback;
@@ -148,7 +147,7 @@ public class ReplCraftClient {
     /**
      * Gets the world relative location of the structure
      */
-    public CompletableFuture<IntVector> getLocation() {
+    public CompletableFuture<Location> getLocation() {
         return this.getWorldLocation(0, 0, 0);
     }
 
@@ -159,22 +158,22 @@ public class ReplCraftClient {
      * @param y The inner size of the structure in the y coordinate
      * @param z The inner size of the structure in the z coordinate
      */
-    public CompletableFuture<IntVector> getSize(final int x, final int y, final int z) {
+    public CompletableFuture<Location> getSize(final int x, final int y, final int z) {
         final JsonObject data = new JsonObject();
         data.add("x", x);
         data.add("y", y);
         data.add("z", z);
 
-        final CompletableFuture<IntVector> callback = new CompletableFuture<>();
+        final CompletableFuture<Location> callback = new CompletableFuture<>();
         this.send("get_size", data).whenComplete(this.inheritException(callback, response -> {
             final JsonObject responseData = response.getData();
-            callback.complete(new IntVector(responseData.get("x").asInt(), responseData.get("y").asInt(), responseData.get("z").asInt()));
+            callback.complete(new Location(responseData.get("x").asInt(), responseData.get("y").asInt(), responseData.get("z").asInt()));
         }));
 
         return callback;
     }
 
-    public CompletableFuture<IntVector> getSize() {
+    public CompletableFuture<Location> getSize() {
         return this.getSize(0, 0, 0);
     }
 
@@ -186,7 +185,7 @@ public class ReplCraftClient {
      * @param sourceContainer The block that will be moved (if null : will be taken from the structure inventory)
      * @param dropsContainer  If a block is being placed, the drops of it will be stored in the given container block (if null: will be put in the structure inventory)
      */
-    public CompletableFuture<Response> setBlock(@NotNull final IntVector location, @NotNull final Block block, @Nullable final IntVector sourceContainer, @Nullable final IntVector dropsContainer) {
+    public CompletableFuture<Response> setBlock(@NotNull final Location location, @NotNull final Block block, @Nullable final Location sourceContainer, @Nullable final Location dropsContainer) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -219,7 +218,7 @@ public class ReplCraftClient {
      * @param location The structure relative location of the sign
      * @return Returns the text of the sign
      */
-    public CompletableFuture<List<String>> getSignText(@NotNull final IntVector location) {
+    public CompletableFuture<List<String>> getSignText(@NotNull final Location location) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<List<String>> callback = new CompletableFuture<>();
 
@@ -235,7 +234,7 @@ public class ReplCraftClient {
      * @param lines    The lines of the new sign text (must be 4)
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> setSignText(@NotNull final IntVector location, @NotNull final String[] lines) {
+    public CompletableFuture<Response> setSignText(@NotNull final Location location, @NotNull final String[] lines) {
         if (lines.length != 4)
             throw new IllegalArgumentException("Lines must be exactly 4!");
 
@@ -261,7 +260,7 @@ public class ReplCraftClient {
      * @param location The location of the block to watch, structure relative
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> watch(@NotNull final IntVector location) {
+    public CompletableFuture<Response> watch(@NotNull final Location location) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -278,7 +277,7 @@ public class ReplCraftClient {
      * @param location The location of the block to unwatch, structure relative
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> unwatch(@NotNull final IntVector location) {
+    public CompletableFuture<Response> unwatch(@NotNull final Location location) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -326,7 +325,7 @@ public class ReplCraftClient {
      * @param location The location of the block to poll
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> poll(@NotNull final IntVector location) {
+    public CompletableFuture<Response> poll(@NotNull final Location location) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -343,7 +342,7 @@ public class ReplCraftClient {
      * @param location The location of the block to unpoll
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> unpoll(@NotNull final IntVector location) {
+    public CompletableFuture<Response> unpoll(@NotNull final Location location) {
         final JsonObject data = new JsonObject();
         final CompletableFuture<Response> callback = new CompletableFuture<>();
 
@@ -394,7 +393,7 @@ public class ReplCraftClient {
     /**
      * @return Returns the inventory of the given container
      */
-    public CompletableFuture<List<ItemSlot>> getInventory(@NotNull final IntVector location) {
+    public CompletableFuture<List<ItemSlot>> getInventory(@NotNull final Location location) {
         final CompletableFuture<List<ItemSlot>> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
 
@@ -415,7 +414,7 @@ public class ReplCraftClient {
      * @param targetItemIndex The target slot index of the item (if null: any)
      * @return Returns a response, useless
      */
-    public CompletableFuture<Response> moveItem(@NotNull final IntVector sourceContainer, final int itemIndex, @Nullable final Integer amount, @NotNull final IntVector targetContainer, @Nullable final Integer targetItemIndex) {
+    public CompletableFuture<Response> moveItem(@NotNull final Location sourceContainer, final int itemIndex, @Nullable final Integer amount, @NotNull final Location targetContainer, @Nullable final Integer targetItemIndex) {
         final CompletableFuture<Response> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
 
@@ -447,7 +446,7 @@ public class ReplCraftClient {
      * @param location Structure relative location of target block
      * @return Returns redstone power level
      */
-    public CompletableFuture<Integer> getRedstonePowerLevel(@NotNull final IntVector location) {
+    public CompletableFuture<Integer> getRedstonePowerLevel(@NotNull final Location location) {
         final CompletableFuture<Integer> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
 
@@ -466,7 +465,6 @@ public class ReplCraftClient {
      * @param message The message to send
      * @return Returns a response, useless
      */
-
     public CompletableFuture<Response> tell(@NotNull final String target, @NotNull final String message) {
         final CompletableFuture<Response> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
@@ -590,7 +588,7 @@ public class ReplCraftClient {
     /**
      * @return Returns the block info of the specified structure-relative coordinates
      */
-    public CompletableFuture<Block> getBlock(@NotNull final IntVector location) {
+    public CompletableFuture<Block> getBlock(@NotNull final Location location) {
         final CompletableFuture<Block> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
         location.apply(data);
@@ -615,7 +613,7 @@ public class ReplCraftClient {
         this.send("respond", data, false);
     }
 
-    public CompletableFuture<Response> craft(final IntVector outputContainer, final SlotReference[] ingredients) {
+    public CompletableFuture<Response> craft(final Location outputContainer, final SlotReference[] ingredients) {
         final CompletableFuture<Response> callback = new CompletableFuture<>();
         final JsonObject data = new JsonObject();
 

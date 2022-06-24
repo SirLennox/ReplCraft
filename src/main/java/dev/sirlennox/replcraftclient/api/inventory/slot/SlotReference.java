@@ -1,14 +1,14 @@
 package dev.sirlennox.replcraftclient.api.inventory.slot;
 
 import com.eclipsesource.json.JsonObject;
-import dev.sirlennox.replcraftclient.api.vector.IntVector;
+import dev.sirlennox.replcraftclient.api.vector.Location;
 
 public class SlotReference {
 
-    private final IntVector source;
+    private final Location source;
     private final int index;
 
-    public SlotReference(final IntVector source, final int index) {
+    public SlotReference(final Location source, final int index) {
         this.source = source;
         this.index = index;
     }
@@ -26,7 +26,7 @@ public class SlotReference {
         return this.index;
     }
 
-    public final IntVector getSource() {
+    public final Location getSource() {
         return this.source;
     }
 

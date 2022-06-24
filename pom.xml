@@ -6,7 +6,7 @@
 
     <groupId>io.github.sirlennox</groupId>
     <artifactId>ReplCraft</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
     <name>ReplCraft</name>
     <url>https://github.com/SirLennox/ReplCraft</url>
     <description>A ReplCraft library for java</description>

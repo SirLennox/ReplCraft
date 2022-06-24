@@ -1,15 +1,20 @@
 package dev.sirlennox.replcraftclient.api.vector;
 
-public class Location extends IntVector {
+import com.eclipsesource.json.JsonObject;
 
-    private final String world;
+public class Location extends Vector<Double> {
 
-    public Location(final String world, final int x, final int y, final int z) {
+    public Location(final double x, final double y, final double z) {
         super(x, y, z);
-        this.world = world;
     }
 
-    public final String getWorld() {
-        return this.world;
+    public void apply(final JsonObject json, final String xName, final String yName, final String zName) {
+        json.add(xName, this.getX());
+        json.add(yName, this.getY());
+        json.add(zName, this.getZ());
+    }
+
+    public void apply(final JsonObject json) {
+        this.apply(json, "x", "y", "z");
     }
 }

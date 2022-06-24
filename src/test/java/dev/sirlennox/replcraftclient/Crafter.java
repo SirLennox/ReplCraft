@@ -2,7 +2,7 @@ package dev.sirlennox.replcraftclient;
 
 import com.neovisionaries.ws.client.WebSocketException;
 import dev.sirlennox.replcraftclient.api.inventory.slot.SlotReference;
-import dev.sirlennox.replcraftclient.api.vector.IntVector;
+import dev.sirlennox.replcraftclient.api.vector.Location;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -14,10 +14,10 @@ public class Crafter {
 
         replCraftClient.start().get();
 
-        replCraftClient.craft(new IntVector(0, 0, 0),
+        replCraftClient.craft(new Location(0, 0, 0),
                 new SlotReference[]{
-                        new SlotReference(new IntVector(0, 1, 0), 0), null, null,
-                        new SlotReference(new IntVector(0, 1, 0), 1), null, null,
+                        new SlotReference(new Location(0, 1, 0), 0), null, null,
+                        new SlotReference(new Location(0, 1, 0), 1), null, null,
                         null, null, null
                 }
         ).get();

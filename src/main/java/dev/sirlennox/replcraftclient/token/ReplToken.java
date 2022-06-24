@@ -1,7 +1,7 @@
 package dev.sirlennox.replcraftclient.token;
 
 import dev.sirlennox.replcraftclient.api.GameProfile;
-import dev.sirlennox.replcraftclient.api.vector.Location;
+import dev.sirlennox.replcraftclient.api.vector.WorldLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -18,8 +18,8 @@ public class ReplToken extends JWTToken {
         return this.getData().get("host").asString();
     }
 
-    public final @NotNull Location getLocation() {
-        return new Location(this.getData().get("world").asString(), this.getData().get("x").asInt(), this.getData().get("y").asInt(), this.getData().get("z").asInt());
+    public final @NotNull WorldLocation getLocation() {
+        return new WorldLocation(this.getData().get("world").asString(), this.getData().get("x").asInt(), this.getData().get("y").asInt(), this.getData().get("z").asInt());
     }
 
     public final @NotNull GameProfile getOwner() {
@@ -31,7 +31,7 @@ public class ReplToken extends JWTToken {
     }
 
     public enum Permission {
-        PUBLIC("public"), PLAYER("player"), UNKNOWN(null);
+        PUBLIC("public"), PLAYER("player"), ADMIN("admin"), UNKNOWN(null);
 
         private final String id;
 
