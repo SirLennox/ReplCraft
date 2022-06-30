@@ -26,12 +26,16 @@ public class ReplToken extends JWTToken {
         return new GameProfile(this.getData().get("username").asString(), UUID.fromString(this.getData().get("uuid").asString()));
     }
 
-    public final @NotNull Permission getPermission() {
-        return Permission.getById(this.getData().get("permission").asString());
+    public final @NotNull Scope getScope() {
+        return Scope.getById(this.getData().get("scope").asString());
     }
 
+
+
+
+
     public enum Permission {
-        PUBLIC("public"), PLAYER("player"), ADMIN("admin"), UNKNOWN(null);
+        PUBLIC("public"), PLAYER("player"), ADMIN("admin");
 
         private final String id;
 
@@ -44,7 +48,27 @@ public class ReplToken extends JWTToken {
         }
 
         public static Permission getById(final String id) {
-            return Arrays.stream(Permission.values()).filter(permission -> Objects.equals(permission.getId(), id)).findFirst().orElse(Permission.UNKNOWN);
+            return Arrays.stream(Permission.values()).filter(permission -> Objects.equals(permission.getId(), id)).findFirst().orElse(null);
         }
     }
+
+    public enum Scope {
+        STRUCTURE("structure"), ITEM("item");
+
+        private final String id;
+
+        Scope(final String id) {
+            this.id = id;
+        }
+
+        public final String getId() {
+            return this.id;
+        }
+
+        public static Scope getById(final String id) {
+            return Arrays.stream(Scope.values()).filter(scope -> Objects.equals(scope.getId(), id)).findFirst().orElse(null);
+        }
+    }
+
+
 }

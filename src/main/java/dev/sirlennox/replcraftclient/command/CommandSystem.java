@@ -1,8 +1,10 @@
 package dev.sirlennox.replcraftclient.command;
 
 import dev.sirlennox.replcraftclient.api.Transaction;
+import dev.sirlennox.replcraftclient.api.listener.ContextListenerAdapter;
 import dev.sirlennox.replcraftclient.api.listener.IListener;
 import dev.sirlennox.replcraftclient.api.listener.ListenerAdapter;
+import dev.sirlennox.replcraftclient.context.Context;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,20 +28,27 @@ public class CommandSystem {
 
     public final IListener createListener() {
         return new ListenerAdapter() {
+
             @Override
-            public void onTransaction(final Transaction transaction) {
-                final String[] split = transaction.getQuery().split(" ");
-                if (split.length < 1)
-                    return;
+            public void onContextOpened(final Context context) {
+                context.addListener(new ContextListenerAdapter() {
+                    @Override
+                    public void onTransaction(final Transaction transaction) {
+                        final String[] split = transaction.getQuery().split(" ");
+                        if (split.length < 1)
+                            return;
 
-                final ICommand command = CommandSystem.this.commands.get(split[0].toLowerCase());
+                        final ICommand command = CommandSystem.this.commands.get(split[0].toLowerCase());
 
-                if (Objects.isNull(command))
-                    return;
+                        if (Objects.isNull(command))
+                            return;
 
-                command.handle(split.length < 2 ? new String[0] : Arrays.copyOfRange(split, 1, split.length), transaction);
+                        command.handle(split.length < 2 ? new String[0] : Arrays.copyOfRange(split, 1, split.length), transaction);
 
-                super.onTransaction(transaction);
+                        super.onTransaction(transaction);
+                    }
+                });
+                super.onContextOpened(context);
             }
         };
     }

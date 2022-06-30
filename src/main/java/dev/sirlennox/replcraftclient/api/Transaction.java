@@ -3,6 +3,7 @@ package dev.sirlennox.replcraftclient.api;
 import com.eclipsesource.json.JsonObject;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
+import dev.sirlennox.replcraftclient.context.Context;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -10,14 +11,14 @@ import java.util.concurrent.CompletableFuture;
 
 public class Transaction {
 
-    private final ReplCraftClient client;
+    private final Context context;
     private final double amount;
     private final String query;
     private final GameProfile player;
     private final int nonce;
 
-    public Transaction(final ReplCraftClient client, final double amount, final String query, final GameProfile player, final int nonce) {
-        this.client = client;
+    public Transaction(final Context context, final double amount, final String query, final GameProfile player, final int nonce) {
+        this.context = context;
         this.amount = amount;
         this.query = query;
         this.player = player;
@@ -25,28 +26,37 @@ public class Transaction {
     }
 
     public void accept() {
-        this.client.respondToTransaction(this.nonce, true);
+        this.respond(true);
     }
 
     public void deny() {
-        this.client.respondToTransaction(this.nonce, false);
+        this.respond(false);
+    }
+
+    private void respond(final boolean accept) {
+        final JsonObject data = new JsonObject();
+
+        data.add("queryNonce", this.nonce);
+        data.add("accept", accept);
+
+        this.context.send("respond", data, false);
     }
 
     public CompletableFuture<Response> tell(final String message) {
-        return this.client.tell(this.getPlayer(), message);
+        return this.context.tell(this.getPlayer(), message);
     }
 
     public void tellWithSplitMessages(final int maxSize, final String... parts) {
-        this.client.tellWithSplitMessages(this.getPlayer(), maxSize, parts);
+        this.context.tellWithSplitMessages(this.getPlayer(), maxSize, parts);
     }
 
     public void tellWithSplitMessages(final String... parts) {
-        this.client.tellWithSplitMessages(this.getPlayer(), parts);
+        this.context.tellWithSplitMessages(this.getPlayer(), parts);
     }
 
-    public static Transaction fromJson(@NotNull final ReplCraftClient client, @NotNull final JsonObject json) throws NumberFormatException {
+    public static Transaction fromJson(@NotNull final Context context, @NotNull final JsonObject json) throws NumberFormatException {
         return new Transaction(
-                client,
+                context,
                 json.get("amount").asDouble(),
                 json.get("query").asString(),
                 new GameProfile(
@@ -73,7 +83,7 @@ public class Transaction {
         return this.nonce;
     }
 
-    public final ReplCraftClient getClient() {
-        return this.client;
+    public final Context getContext() {
+        return this.context;
     }
 }

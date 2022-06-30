@@ -5,9 +5,11 @@ import com.eclipsesource.json.JsonObject;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFrame;
+import dev.sirlennox.replcraftclient.context.Context;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
 import dev.sirlennox.replcraftclient.api.Transaction;
 import dev.sirlennox.replcraftclient.api.event.BlockUpdateEvent;
+import dev.sirlennox.replcraftclient.context.OpenCause;
 
 import java.util.Objects;
 
@@ -22,16 +24,29 @@ public class WebSocketEventListener extends WebSocketAdapter {
     @Override
     public void onFrame(final WebSocket websocket, final WebSocketFrame frame) throws Exception {
         final JsonObject data = Json.parse(new String(frame.getPayload())).asObject();
+
         if (Objects.isNull(data.get("type")))
             return;
 
+        final int contextId = data.get("context").asInt();
 
         switch (data.get("type").asString()) {
+            case "contextOpened":
+                final Context context = new Context(contextId, this.client, OpenCause.getById(data.get("cause").asString()));
+                this.client.getContexts().add(context);
+                this.client.callListener(listener -> listener.onContextOpened(context));
+                break;
+            case "contextClosed":
+                final Context closedContext = this.client.getContextById(data.get("context").asInt());
+                this.client.removeContext(closedContext.getId());
+                closedContext.callListener(listener -> listener.onClose(data.get("cause").asString()));
+                break;
             case "block update":
-                this.client.callListener(listener -> listener.onBlockUpdate(BlockUpdateEvent.fromJson(data)));
+                this.client.getContextById(contextId).callListener(listener -> listener.onBlockUpdate(BlockUpdateEvent.fromJson(data)));
                 break;
             case "transact":
-                this.client.callListener(listener -> listener.onTransaction(Transaction.fromJson(this.client, data)));
+                final Context transactContext = this.client.getContextById(contextId);
+                transactContext.callListener(listener -> listener.onTransaction(Transaction.fromJson(transactContext, data)));
                 break;
         }
 

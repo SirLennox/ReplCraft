@@ -4,6 +4,7 @@ import com.eclipsesource.json.JsonObject;
 import dev.sirlennox.replcraftclient.ReplCraftClient;
 import dev.sirlennox.replcraftclient.api.vector.Location;
 import dev.sirlennox.replcraftclient.connection.exchange.Response;
+import dev.sirlennox.replcraftclient.context.Context;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,16 +12,16 @@ import java.util.concurrent.CompletableFuture;
 
 public class Slot extends SlotReference {
 
-    private final ReplCraftClient client;
+    private final Context context;
 
-    public Slot(final ReplCraftClient client, final Location source, final int index) {
+    public Slot(final Context context, final Location source, final int index) {
         super(source, index);
-        this.client = client;
+        this.context = context;
     }
 
-    public static Slot fromJson(@NotNull final ReplCraftClient client, @NotNull final Location source, @NotNull final JsonObject json) {
+    public static Slot fromJson(@NotNull final Context context, @NotNull final Location source, @NotNull final JsonObject json) {
         return new Slot(
-                client,
+                context,
                 source,
                 json.get("index").asInt()
         );
@@ -35,7 +36,7 @@ public class Slot extends SlotReference {
      * @return Returns a response, useless
      */
     public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final Location targetContainer, @Nullable Integer targetItemIndex) {
-        return this.client.moveItem(this.getSource(), this.getIndex(), amount, targetContainer, targetItemIndex);
+        return this.context.moveItem(this.getSource(), this.getIndex(), amount, targetContainer, targetItemIndex);
     }
 
     public CompletableFuture<Response> moveTo(@Nullable final Integer amount, @NotNull final Location targetContainer) {
@@ -46,7 +47,7 @@ public class Slot extends SlotReference {
         return this.moveTo(null, targetContainer);
     }
 
-    public final ReplCraftClient getClient() {
-        return this.client;
+    public final Context getContext() {
+        return this.context;
     }
 }
