@@ -54,7 +54,7 @@ public class BlockUpdateEvent {
 
 
     public enum Cause {
-        BREAK("break"), PLACE("place"), POLL("poll"), BURN("burn"), EXPLODE("explode"), FADE("fade"), GROW("grow"), IGNITE("ignite"), PISTON_EXTEND("piston_extend"), PISTON_RETRACT("piston_retract"), FLUID("fluid"), DECAY("decay"), REDSTONE("redstone"), UNKNOWN(null);
+        BREAK("break"), PLACE("place"), POLL("poll"), BURN("burn"), EXPLODE("explode"), FADE("fade"), GROW("grow"), IGNITE("ignite"), PISTON_EXTEND("piston_extend"), PISTON_RETRACT("piston_retract"), FLUID("fluid"), DECAY("decay"), REDSTONE("redstone"), STRUCTURE_GROW("structure_grow");
 
         private final String id;
 
@@ -67,7 +67,7 @@ public class BlockUpdateEvent {
         }
 
         public static Cause getById(final String id) {
-            return Arrays.stream(Cause.values()).filter(cause -> Objects.equals(cause.getId(), id)).findFirst().orElse(Cause.UNKNOWN);
+            return Arrays.stream(Cause.values()).filter(cause -> Objects.equals(cause.getId(), id)).findFirst().orElse(null);
         }
     }
 }

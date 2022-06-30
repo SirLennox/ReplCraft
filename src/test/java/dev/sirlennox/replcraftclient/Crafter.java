@@ -18,7 +18,6 @@ public class Crafter {
         replCraftClient.addListener(new ListenerAdapter() {
             @Override
             public void onContextOpened(final Context context) {
-
                 context.craft(new Location(0, 0, 0),
                         new SlotReference[]{
                                 new SlotReference(new Location(0, 1, 0), 0), null, null,
